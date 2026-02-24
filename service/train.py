@@ -4,7 +4,7 @@ import pandas as pd
 import os
 from service.features import FEATURE_COLUMNS, TARGET_COLUMN, CAT_FEATURES
 
-MODEL_PATH = "models/catboost_model.cbm"
+MODEL_PATH = "./ml/vmodels/catboost_model.cbm"
 
 
 class LookalikeModel:
@@ -52,7 +52,6 @@ class LookalikeModel:
         
         reasons_list = []
         for i in range(len(X)):
-            # Берем топ-3 фичи по абсолютному влиянию
             feature_impacts = [(FEATURE_COLUMNS[j], float(shap_values[i][j])) for j in range(len(FEATURE_COLUMNS))]
             top_features = sorted(feature_impacts, key=lambda x: abs(x[1]), reverse=True)[:3]
             reasons_list.append([{"feature": f, "impact": round(v, 4)} for f, v in top_features])

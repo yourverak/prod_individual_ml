@@ -47,27 +47,21 @@ y = df_train['label']
 print("Размер выборки:", len(X))
 print("\nРаспределение категорий:\n", y.value_counts())
 
-# Бьем на трейн и тест, чтобы проверить качество модели
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# --- СОЗДАЕМ И ОБУЧАЕМ NLP-ПАЙПЛАЙН ---
 print("\n🤖 Обучаем TF-IDF + LogisticRegression...")
 nlp_pipeline = Pipeline([
-    ('tfidf', TfidfVectorizer(max_features=2000, ngram_range=(1, 2))), # Ищет отдельные слова и пары слов
+    ('tfidf', TfidfVectorizer(max_features=2000, ngram_range=(1, 2))), 
     ('clf', LogisticRegression(max_iter=1000, class_weight='balanced'))
 ])
 
 nlp_pipeline.fit(X_train, y_train)
 
-# Проверяем, как хорошо она выучила слова
 y_pred = nlp_pipeline.predict(X_test)
 print("\n📊 Отчет о качестве (Test):")
 print(classification_report(y_test, y_pred))
 
-# --- СОХРАНЯЕМ ВЕСА ДЛЯ СЕРВИСА ---
 os.makedirs("models", exist_ok=True)
 model_path = "models/offer_classifier.pkl"
 joblib.dump(nlp_pipeline, model_path)
 
-print(f"\n✅ УРА! NLP-модель обучена и сохранена в {model_path}")
-print("Теперь она весит пару мегабайт и делает предсказание за 0.01 сек.")

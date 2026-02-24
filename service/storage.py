@@ -10,9 +10,7 @@ def batch_key(version: str, table: str, batch_id: int):
     return f"{version}/{table}/batch_{batch_id}.json"
 
 def save_batch(version: str, table: str, batch_id: int, records: list):
-    """
-    Идемпотентная загрузка батча в MinIO
-    """
+
     key = batch_key(version, table, batch_id)
 
     # идемпотентность
@@ -26,10 +24,7 @@ def save_batch(version: str, table: str, batch_id: int, records: list):
     s3.put_object(Bucket=RAW_BUCKET, Key=key, Body=body)
 
 def load_table(version: str, table: str) -> pd.DataFrame | None:
-    """
-    Читает ВСЕ батчи таблицы из MinIO → pandas
-    Использовать ТОЛЬКО в pipeline, не в API
-    """
+
     prefix = f"{version}/{table}/"
 
     resp = s3.list_objects_v2(Bucket=RAW_BUCKET, Prefix=prefix)

@@ -1,29 +1,38 @@
 import numpy as np
+import pandas as pd
 
-def calculate_map_at_100(y_true, y_probas):
-    """
-    Вычисляет Average Precision для топ-100 предсказаний.
-    y_true: массив реальных таргетов (0 или 1)
-    y_probas: массив вероятностей от модели
-    """
-    # 1. Объединяем таргет и вероятности и сортируем по убыванию вероятности
-    data = sorted(zip(y_probas, y_true), key=lambda x: x[0], reverse=True)
+def calculate_map_at_100(df: pd.DataFrame, target_col: str = 'target', score_col: str = 'score') -> float:
+
+    if 'offer_id' not in df.columns or df.empty:
+        return 0.0
+
+    ap_scores = []
     
-    # 2. Берем только топ-100
-    top_100 = data[:100]
-    
-    # 3. Считаем Average Precision
-    relevant_count = 0  # Сколько реальных единичек мы встретили
-    precision_sum = 0   # Сумма точностей в точках, где встретили единичку
-    
-    for i, (prob, label) in enumerate(top_100):
-        if label == 1:
-            relevant_count += 1
-            # Точность на текущем шаге i: (кол-во найденных / текущая позиция)
-            precision_sum += relevant_count / (i + 1)
+
+    for offer_id, group in df.groupby('offer_id'):
+
+        total_positives = group[target_col].sum()
+
+        if total_positives == 0:
+            continue
             
-    if relevant_count == 0:
+
+        sorted_group = group.sort_values(score_col, ascending=False).head(100)
+        targets = sorted_group[target_col].values
+        
+        relevant_count = 0
+        precision_sum = 0.0
+
+        for i, label in enumerate(targets):
+            if label == 1:
+                relevant_count += 1
+                precision_sum += relevant_count / (i + 1)
+                
+
+        ap = precision_sum / min(total_positives, 100)
+        ap_scores.append(ap)
+        
+    if not ap_scores:
         return 0.0
         
-    # Делим на общее количество найденных релевантных объектов в топ-100
-    return precision_sum / relevant_count
+    return float(np.mean(ap_scores))

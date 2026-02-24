@@ -1,34 +1,29 @@
 # version: '3.8'
 
 services:
-  # 1. MinIO (Наш S3-склад)
+
   minio:
     image: minio/minio:latest
     container_name: lookalike_minio
-    # Запускаем сервер и указываем порт для консоли
     command: server /data --console-address ":9001"
     ports:
-      - "9000:9000"  # Порт для API (туда стучится наш код)
-      - "9001:9001"  # Порт для бразуера (админка)
+      - "9000:9000"  
+      - "9001:9001"  
     environment:
       MINIO_ROOT_USER: "admin"
       MINIO_ROOT_PASSWORD: "password"
     volumes:
-      # Чтобы данные не удалялись при перезапуске контейнера
       - ./data/minio_data:/data
 
-  # 2. MLflow (Журнал экспериментов)
   mlflow:
     image: ghcr.io/mlflow/mlflow:latest
     container_name: lookalike_mlflow
     ports:
       - "5050:5000"
     environment:
-      # Говорим MLflow, что артефакты (файлы моделей) надо хранить в MinIO
       MLFLOW_S3_ENDPOINT_URL: http://minio:9000
       AWS_ACCESS_KEY_ID: "admin"
       AWS_SECRET_ACCESS_KEY: "password"
-    # Запускаем сервер MLflow
     command: >
       mlflow server
       --backend-store-uri sqlite:///mlflow.db
@@ -37,14 +32,13 @@ services:
     depends_on:
       - minio
 
-  # 3. Твой сервис
   app:
-    build: .             # Строим из текущей папки (Dockerfile)
+    build: .             
     container_name: lookalike_app
     ports:
-      - "80:80"          # Чекер стучится на 80 порт
+      - "80:80"          
     environment:
-      # Передаем настройки, чтобы код знал, куда стучаться
+     
       - S3_ENDPOINT_URL=http://minio:9000
       - MLFLOW_TRACKING_URI=http://mlflow:5000
       - AWS_ACCESS_KEY_ID=admin

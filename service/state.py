@@ -1,5 +1,4 @@
 from threading import Lock
-import datetime
 
 state_lock = Lock()
 
@@ -11,11 +10,11 @@ STATE = {
     "trained_on": "v0",
     "last_action": "none",
     
-    # Monitoring
+    "received_tables": {},
+    
     "drift_detected": False,
     "drift_score": 0.0,
     
-    # Data Quality
     "data_quality": {
         "valid": True,
         "checks_total": 0,
@@ -24,6 +23,5 @@ STATE = {
         "failed_checks": []
     },
     
-    # MLflow history
     "experiments": []
 }

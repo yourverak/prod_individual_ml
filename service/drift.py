@@ -8,11 +8,10 @@ DRIFT_THRESHOLD = 0.3
 
 def check_drift(current_df: pd.DataFrame) -> tuple[bool, float]:
     if not os.path.exists(REFERENCE_DATA_PATH):
-        return False, 0.0 # Первое обучение, не с чем сравнивать
+        return False, 0.0
 
     reference_df = pd.read_csv(REFERENCE_DATA_PATH)
     
-    # Используем только численные/категориальные фичи (без ID)
     features = current_df.select_dtypes(include=['number', 'object']).columns.tolist()
     features = [f for f in features if f not in ["user_id", "target", "offer_id"]]
 

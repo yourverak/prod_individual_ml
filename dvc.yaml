@@ -1,18 +1,18 @@
 stages:
-  data_validation:
-    cmd: python -c "print('Validation handled dynamically in python API')"
+  feature_engineering:
+    cmd: python3 -m service.features
     deps:
-      - service/validation.py
+      - data/raw/
+      - service/features.py
     outs:
-      - reports/validation_report.json
-  drift_detection:
-    cmd: python -c "print('Drift handled in python API')"
-    deps:
-      - service/drift.py
+      - data/features.csv
   train:
-    cmd: python -c "print('Training handled in API')"
+    cmd: python3 -m service.train
     deps:
+      - data/features.csv
       - service/train.py
     params:
-      - model_type
+      - iterations
       - learning_rate
+    outs:
+      - models/catboost_model.cbm
