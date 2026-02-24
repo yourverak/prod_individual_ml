@@ -1,3 +1,4 @@
+# Этот файл писался ллм
 import pandas as pd
 import numpy as np
 from sklearn.linear_model import LogisticRegression
@@ -7,10 +8,10 @@ from service.features import prepare_features, FEATURE_COLUMNS, TARGET_COLUMN
 from service.metrics import calculate_map_at_100
 
 def main():
-
+    print("📥 Загрузка локальных CSV...")
     
     try:
-        
+        # Ограничиваем строки для скорости теста
         people = pd.read_csv("/Users/macbookvera/Desktop/ИИ/Prod_final_indv/data/v1-2/prod_clients.csv", nrows=50000)
         offer_activation = pd.read_csv("/Users/macbookvera/Desktop/ИИ/Prod_final_indv/data/v1-2/offer_activation.csv")
         receipts = pd.read_csv("/Users/macbookvera/Desktop/ИИ/Prod_final_indv/data/v2/receipts.csv", nrows=100000)
