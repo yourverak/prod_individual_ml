@@ -12,7 +12,7 @@ s3 = boto3.client(
     endpoint_url=S3_ENDPOINT,
     aws_access_key_id=S3_ACCESS_KEY,
     aws_secret_access_key=S3_SECRET_KEY,
-    config=Config(signature_version="s3v4"),
+    config=Config(signature_version="s3v4"), # протокол подписи запросов, для совместимости с современными протоколами безопасности 
     region_name="us-east-1"
 )
 

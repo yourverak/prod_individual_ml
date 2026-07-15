@@ -49,7 +49,6 @@ print("\nРаспределение категорий:\n", y.value_counts())
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-print("\n🤖 Обучаем TF-IDF + LogisticRegression...")
 nlp_pipeline = Pipeline([
     ('tfidf', TfidfVectorizer(max_features=2000, ngram_range=(1, 2))), 
     ('clf', LogisticRegression(max_iter=1000, class_weight='balanced'))
@@ -58,7 +57,6 @@ nlp_pipeline = Pipeline([
 nlp_pipeline.fit(X_train, y_train)
 
 y_pred = nlp_pipeline.predict(X_test)
-print("\n📊 Отчет о качестве (Test):")
 print(classification_report(y_test, y_pred))
 
 os.makedirs("models", exist_ok=True)
