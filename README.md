@@ -33,7 +33,8 @@ The service facilitates targeted marketing by matching offers to potential custo
     ├── upload_data.py
     └── validation.py
 ```
-
+### Machine Learning (ml/)
+* `models/offer_classifier`: Pre-trained model for offer description classification (trained via `train_nlp.py`). This directory stores the latest model version.
 ### Service Layer (service/)
 1. `api.py`: FastAPI interface implementing contract endpoints (`/lookalike`, `/data/batch`, `/monitoring/drift`, etc.).
 2. `drift.py`: Statistical drift detection module using Evidently AI.
@@ -57,17 +58,28 @@ The service facilitates targeted marketing by matching offers to potential custo
 * **Infrastructure:** Docker, Docker Compose, MinIO.
 * **Tooling:** DVC, MLflow, Evidently, Great Expectations.
 
-## Data Insights & Feature Engineering
+## EDA
 
-Key findings from EDA:
-* **Key Predictors:** `has_past_rewards` and `rewards_count` are highly correlated with the target variable.
-* **Engineered Features:** Implemented `hunter_index`, `online_share`, and `rec_unique_categories`.
-* **Preprocessing:** Numerical outliers capped using the 3 IQR rule. Feature selection based on SHAP values.
+The `main.ipynb` notebook documents extensive research and hypothesis testing. Key findings:
+
+* **Balanced Dataset:** Dataset v1 is well-balanced with a baseline conversion rate of approximately 33%.
+* **Correlations:** Features `has_past_rewards` and `rewards_count` show the strongest correlation with the target. Customers with previous cashback experience convert nearly twice as often (45% vs 28%).
+* **Age Factor:** A direct correlation exists: older clients show a higher response rate to bank offers.
+* **The "Active Client" Paradox:** Less active clients tend to respond to offers more readily than highly active banking users.
+
+### Feature Engineering
+To enhance model performance, the following features were engineered:
+* `hunter_index`: `rewards_count / (tx_total_count + 1)`. Identifies deal-seeking behavior.
+* `online_share`: `tx_online_count / tx_total_count`. Measures digital transaction propensity.
+* `tx_sum_mean` & `tx_sum_total`: Numerical mapping of categorical transaction buckets (e.g., "10k+", "1k-5k") to mean values.
+* `rec_unique_categories`: Unique category count to distinguish between specialized vs. general shoppers.
+
+### Preprocessing & Model Selection
+* **Outlier Handling:** Outliers in `tx_total_count`, `tx_sum_total`, `tx_sum_mean`, `items_count_sum`, and `items_cost_sum` were handled using the 3 IQR rule.
+* **Model Selection:** CatBoost was trained to evaluate feature importance via SHAP values, guiding the final feature selection.
 
 # Look-a-Like Service: Система подбора аудитории для банковских офферов
 ## Сервис предназначен для автоматизированного подбора целевой аудитории для маркетинговых офферов банка. Система реализует полный цикл MLOps: от обработки потоковых данных и валидации качества до детектирования дрейфа и автоматического переобучения моделей.
-
-### Структура решения
 
 ### Структура решения
 
