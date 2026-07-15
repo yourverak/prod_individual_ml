@@ -3,8 +3,70 @@
 ![CatBoost](https://img.shields.io/badge/ML-CatBoost-yellow.svg)
 ![Docker](https://img.shields.io/badge/Docker-ready-blue.svg)
 
-# Look-a-Like Service: Решение для олимпиады Prod
-## Данный репозиторий содержит сервис для подбора Look-a-Like аудитории банковских клиентов под конкретные офферы партнеров с автоматическим контролем дрейфа данных.
+# Look-a-Like Service: Banking Offer Targeting System
+## A production-ready service designed to identify high-potential audiences for bank marketing offers. The system manages the full MLOps lifecycle, including real-time batch data ingestion, quality validation, data drift detection, and automated model retraining.
+
+## Project Overview
+
+The service facilitates targeted marketing by matching offers to potential customers while filtering out existing brand clients.
+
+## Project Structure and Module Descriptions
+
+```text
+├── data/
+│   ├── v1-2/        # Local testing data (version 1)
+│   └── v2-2/        # Local testing data (version 2)
+├── ml/
+│   └── models/      # Pre-trained models and training artifacts
+└── service/         # Source code and application logic
+    ├── api.py
+    ├── drift.py
+    ├── features.py
+    ├── metrics.py
+    ├── pipeline.py
+    ├── s3_utils.py
+    ├── schemas.py
+    ├── state.py
+    ├── storage.py
+    ├── train_nlp.py
+    ├── train.py
+    ├── upload_data.py
+    └── validation.py
+```
+
+### Service Layer (service/)
+1. `api.py`: FastAPI interface implementing contract endpoints (`/lookalike`, `/data/batch`, `/monitoring/drift`, etc.).
+2. `drift.py`: Statistical drift detection module using Evidently AI.
+3. `features.py`: Feature engineering and data preprocessing logic.
+4. `metrics.py`: Implementation of the MAP@100 metric for ranking quality assessment.
+5. `pipeline.py`: Orchestration of the training and validation processes.
+6. `s3_utils.py`: Boto3 wrappers for MinIO (S3) interaction.
+7. `schemas.py`: Pydantic schemas for strict JSON request validation.
+8. `state.py`: Application state management (model versions, statuses, etc.).
+9. `storage.py`: Data storage logic.
+10. `train_nlp.py`: Training script for the TF-IDF offer category classifier.
+11. `train.py`: Model training script and SHAP value calculation for interpretability.
+12. `upload_data.py`: Utility script for local testing and data injection simulation.
+13. `validation.py`: Data quality control using Great Expectations.
+
+## Technical Stack
+
+* **Language:** Python 3.10.
+* **API Layer:** FastAPI.
+* **ML Core:** CatBoost, TF-IDF.
+* **Infrastructure:** Docker, Docker Compose, MinIO.
+* **Tooling:** DVC, MLflow, Evidently, Great Expectations.
+
+## Data Insights & Feature Engineering
+
+Key findings from EDA:
+* **Key Predictors:** `has_past_rewards` and `rewards_count` are highly correlated with the target variable.
+* **Engineered Features:** Implemented `hunter_index`, `online_share`, and `rec_unique_categories`.
+* **Preprocessing:** Numerical outliers capped using the 3 IQR rule. Feature selection based on SHAP values.
+
+# Look-a-Like Service: Система подбора аудитории для банковских офферов
+## Сервис предназначен для автоматизированного подбора целевой аудитории для маркетинговых офферов банка. Система реализует полный цикл MLOps: от обработки потоковых данных и валидации качества до детектирования дрейфа и автоматического переобучения моделей.
+
 ### Структура решения
 
 ### Структура решения
